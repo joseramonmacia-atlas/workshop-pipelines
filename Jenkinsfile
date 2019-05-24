@@ -20,19 +20,34 @@ pipeline {
     }
 
     stages {
-        stage('stage-1-name') {
+        stage('Compile') {
             steps {
-                // steps for stage 1 come here
-                echo "stage-1"
+                echo "-=- compiling project -=-"
+                sh "./mvnw clean compile"
             }
         }
 
-
-        stage('stage-n-name') {
+        stage('Unit tests') {
             steps {
-                // steps for stage n come here
-                echo "stage-2"
+                echo "-=- execute unit tests -=-"
+                sh "./mvnw test"
+                junit 'target/surefire-reports/*.xml'
+                jacoco execPattern: 'target/jacoco.exec'
+            }
+        }
 
+        stage('Mutation tests') {
+            steps {
+                echo "-=- execute mutation tests -=-"
+                sh "./mvnw org.pitest:pitest-maven:mutationCoverage"
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "-=- packaging project -=-"
+                sh "./mvnw package -DskipTests"
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
