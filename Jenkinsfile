@@ -17,7 +17,6 @@ pipeline {
             }
         }
 
-        ...
 
         stage('stage-n-name') {
             steps {
