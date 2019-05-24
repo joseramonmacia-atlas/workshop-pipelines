@@ -83,6 +83,48 @@ pipeline {
                 perfReport sourceDataFiles: 'target/jmeter/results/*.csv'
             }
         }
+
+        stage('Performance tests') {
+            steps {
+                echo "-=- execute performance tests -=-"
+                sh "./mvnw jmeter:jmeter jmeter:results -Djmeter.target.host=${TEST_CONTAINER_NAME} -Djmeter.target.port=${APP_LISTENING_PORT} -Djmeter.target.root=${APP_CONTEXT_ROOT}"
+                perfReport sourceDataFiles: 'target/jmeter/results/*.csv', errorUnstableThreshold: 0, errorFailedThreshold: 5, errorUnstableResponseTimeThreshold: 'default.jtl:100'
+            }
+        }
+
+        stage('Dependency vulnerability tests') {
+            steps {
+                echo "-=- run dependency vulnerability tests -=-"
+                sh "./mvnw dependency-check:check"
+                dependencyCheckPublisher
+            }
+        }
+
+        stage('Code inspection & quality gate') {
+            steps {
+                echo "-=- run code inspection & check quality gate -=-"
+                withSonarQubeEnv('ci-sonarqube') {
+                    sh "./mvnw sonar:sonar"
+                }
+                timeout(time: 10, unit: 'MINUTES') {
+                    //waitForQualityGate abortPipeline: true
+                    script {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK' && qg.status != 'WARN') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Dependency vulnerability tests') {
+            steps {
+                echo "-=- run dependency vulnerability tests -=-"
+                sh "./mvnw dependency-check:check"
+                dependencyCheckPublisher failedTotalHigh: '0', unstableTotalHigh: '1', failedTotalNormal: '2', unstableTotalNormal: '5'
+            }
+        }
     }
 
     post {
