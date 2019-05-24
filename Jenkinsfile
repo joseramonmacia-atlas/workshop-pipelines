@@ -11,7 +11,7 @@ pipeline {
 
     environment {
         // properties or environment variables, new or derived
-        ORG_NAME = "deors"
+        ORG_NAME = "joseramonmaciaatlas"
         APP_NAME = "workshop-pipelines"
         APP_CONTEXT_ROOT = "/"
         APP_LISTENING_PORT = "8080"
@@ -107,6 +107,13 @@ pipeline {
                 echo "-=- run dependency vulnerability tests -=-"
                 sh "./mvnw dependency-check:check"
                 dependencyCheckPublisher failedTotalHigh: '0', unstableTotalHigh: '1', failedTotalNormal: '2', unstableTotalNormal: '5'
+            }
+        }
+
+        stage('Push Docker image') {
+            steps {
+                echo "-=- push Docker image -=-"
+                sh "./mvnw docker:push"
             }
         }
     }
