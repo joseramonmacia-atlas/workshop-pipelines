@@ -11,7 +11,7 @@ pipeline {
 
     environment {
         // properties or environment variables, new or derived
-        ORG_NAME = "joseramonmaciaatlas"
+        ORG_NAME = "deors"
         APP_NAME = "workshop-pipelines"
         APP_CONTEXT_ROOT = "/"
         APP_LISTENING_PORT = "8080"
@@ -110,12 +110,7 @@ pipeline {
             }
         }
 
-        // stage('Push Docker image') {
-        //     steps {
-        //         echo "-=- push Docker image -=-"
-        //         sh "./mvnw docker:push"
-        //     }
-        // }
+        
     }
 
     post {
