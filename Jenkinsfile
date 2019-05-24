@@ -41,7 +41,7 @@ pipeline {
         // post-process activities, e.g. cleanup or publish
         always {
             echo "-=- remove deployment -=-"
-            sh "docker stop ${TEST_CONTAINER_NAME}"
+            // sh "docker stop ${TEST_CONTAINER_NAME}"
         }
     }
 }
