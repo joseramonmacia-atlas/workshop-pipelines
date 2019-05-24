@@ -110,6 +110,13 @@ pipeline {
             }
         }
 
+        stage('Push Docker image') {
+            steps {
+                echo "-=- push Docker image -=-"
+                sh "./mvnw docker:push"
+            }
+        }
+
         
     }
 
