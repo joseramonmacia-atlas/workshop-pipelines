@@ -5,7 +5,7 @@ pipeline {
         // how the pipeline will be built
         docker {
             image 'adoptopenjdk/openjdk11:jdk-11.0.3_7'
-            args '--network ci'
+            args '--network ci --mount type=volume,source=ci-maven-home,target=/root/.m2'
         }
     }
 
