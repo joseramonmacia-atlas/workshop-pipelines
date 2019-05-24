@@ -50,13 +50,27 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+
+        stage('Build Docker image') {
+            steps {
+                echo "-=- build Docker image -=-"
+                sh "./mvnw docker:build"
+            }
+        }
+
+        stage('Run Docker image') {
+            steps {
+                echo "-=- run Docker image -=-"
+                sh "docker run --name ${TEST_CONTAINER_NAME} --detach --rm --network ci --expose ${APP_LISTENING_PORT} --expose 6300 --env JAVA_OPTS='-Dserver.port=${APP_LISTENING_PORT} -Dspring.profiles.active=ci -javaagent:/jacocoagent.jar=output=tcpserver,address=*,port=6300' ${ORG_NAME}/${APP_NAME}:latest"
+            }
+        }
     }
 
     post {
         // post-process activities, e.g. cleanup or publish
         always {
             echo "-=- remove deployment -=-"
-            // sh "docker stop ${TEST_CONTAINER_NAME}"
+            sh "docker stop ${TEST_CONTAINER_NAME}"
         }
     }
 }
