@@ -21,6 +21,8 @@ pipeline {
         stage('stage-n-name') {
             steps {
                 // steps for stage n come here
+                echo "stage-2"
+
             }
         }
     }
